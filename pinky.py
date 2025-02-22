@@ -14,3 +14,6 @@ if __name__ == "__main__":
         print(source)
 
         ## Tokenize input
+        print("LEXER:")
+        tokens = Lexer(source).tokenize()
+        print(tokens)

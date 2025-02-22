@@ -1,2 +1,4 @@
 # Evaluate a single expression
 2 + 3
+2 - 3
+;*+-

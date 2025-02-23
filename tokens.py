@@ -62,6 +62,26 @@ class TokenType(Enum):
     RET = "RET"
 
 
+keywords = {
+    "if": TokenType.IF,
+    "then": TokenType.THEN,
+    "else": TokenType.ELSE,
+    "true": TokenType.TRUE,
+    "false": TokenType.FALSE,
+    "and": TokenType.AND,
+    "or": TokenType.OR,
+    "while": TokenType.WHILE,
+    "do": TokenType.DO,
+    "for": TokenType.FOR,
+    "func": TokenType.FUNC,
+    "null": TokenType.NULL,
+    "end": TokenType.END,
+    "print": TokenType.PRINT,
+    "println": TokenType.PRINTLN,
+    "ret": TokenType.RET,
+}
+
+
 class Token:
     def __init__(self, token_type, lexeme, line):
         self.token_type = token_type

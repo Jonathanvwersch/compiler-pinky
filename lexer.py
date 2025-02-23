@@ -1,4 +1,4 @@
-from tokens import Token, TokenType
+from tokens import Token, TokenType, keywords
 
 
 class Lexer:
@@ -68,7 +68,13 @@ class Lexer:
     def handle_identifier(self):
         while self.peek().isalnum() or self.peek() == "_":
             self.advance()
-        self.add_token(TokenType.IDENTIFIER)
+        ## check if identifier matches a key in the keywords dict
+        text = self.source[self.start : self.curr]
+        keyword_type = keywords.get(text)
+        if keyword_type == None:
+            self.add_token(TokenType.IDENTIFIER)
+        else:
+            self.add_token(keyword_type)
 
     def tokenize(self):
         while self.curr < len(self.source):
@@ -104,7 +110,12 @@ class Lexer:
             elif ch == "+":
                 self.add_token(TokenType.PLUS)
             elif ch == "-":
-                self.add_token(TokenType.MINUS)
+                if self.peek() == "-":
+                    while self.peek() != "\n" and not self.is_index_out_of_bounds():
+                        self.advance()
+                    self.advance()
+                else:
+                    self.add_token(TokenType.MINUS)
             elif ch == "*":
                 self.add_token(TokenType.STAR)
             elif ch == "^":
@@ -146,5 +157,9 @@ class Lexer:
                 self.handle_string(ch)
             elif ch.isalpha() or ch == "_":
                 self.handle_identifier()
+            else:
+                raise SyntaxError(
+                    f"[Line ${self.line}] Error at {ch}: Unexpected character"
+                )
 
         return self.tokens

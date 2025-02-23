@@ -1,8 +1,5 @@
-from typing import List, Tuple
+from typing import List
 from tokens import Token, TokenType, keywords
-
-TokenTuple = Tuple[TokenType, str, int]
-Tokens = List[TokenTuple]
 
 
 class Lexer:
@@ -11,7 +8,7 @@ class Lexer:
         self.start = 0
         self.curr = 0
         self.line = 1
-        self.tokens: Tokens = []
+        self.tokens: List[Token] = []
         pass
 
     def advance(self):

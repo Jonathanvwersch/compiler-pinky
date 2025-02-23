@@ -23,5 +23,5 @@ class Parser:
         pass
 
     def parse(self):
-        ast = self.expr
+        ast = self.expr()
         return ast

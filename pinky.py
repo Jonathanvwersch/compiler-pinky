@@ -21,6 +21,6 @@ if __name__ == "__main__":
         for token in tokens:
             print(token)
 
-		print("PARSED AST:")
-		ast = Parser(tokens).parse()
-		print(ast)
+        print("PARSED AST:")
+        ast = Parser(tokens).parse()
+        print(ast)

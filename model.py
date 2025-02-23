@@ -1,5 +1,4 @@
-from lexer import TokenTuple
-from tokens import TokenType
+from tokens import Token, TokenType
 
 
 class Expr:
@@ -49,15 +48,15 @@ class UnOp(Expr):
     Example -operand
     """
 
-    def __init__(self, op: TokenTuple, operand: Expr):
-        assert isinstance(op, TokenTuple), op
+    def __init__(self, op: Token, operand: Expr):
+        assert isinstance(op, Token), op
         assert isinstance(operand, Expr), operand
 
         self.op = op
         self.operand = operand
 
     def __repr__(self):
-        return f"UnOP({self.op[1]}, {self.operand})"
+        return f"UnOP({self.op.lexeme}, {self.operand})"
 
 
 class BinOp(Expr):
@@ -65,8 +64,8 @@ class BinOp(Expr):
     Example x + y
     """
 
-    def __init__(self, op: TokenTuple, left: Expr, right: Expr):
-        assert isinstance(op, TokenTuple), op
+    def __init__(self, op: Token, left: Expr, right: Expr):
+        assert isinstance(op, Token), op
         assert isinstance(left, Expr), left
         assert isinstance(right, TokenType), right
 
@@ -75,7 +74,7 @@ class BinOp(Expr):
         self.right = right
 
     def __repr__(self):
-        return f"BinOp({self.op[1]}, {self.left}, {self.right})"
+        return f"BinOp({self.op.lexeme}, {self.left}, {self.right})"
 
 
 class Grouping(Expr):

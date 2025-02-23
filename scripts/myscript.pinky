@@ -1,4 +1,20 @@
 # Evaluate a single expression
 2 + 3
 2 - 3
-;*+-
+
+:= > >= <= == ~= ~ :
+
+254 254.4 45.4
+
+'hello'
+
+"hello"
+
+"'hello'"
+
+'"hello"'
+
+if x >= 0 then
+    println('x is positive')
+else:
+    println('x is negative')

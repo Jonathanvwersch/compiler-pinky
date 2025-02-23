@@ -27,12 +27,13 @@ class TokenType(Enum):
     NOT = "~"
     GT = ">"
     LT = "<"
+    EQ = "="
 
     # Two-char tokens
     GE = ">="
     LE = "<="
     NE = "~="
-    EQ = "=="
+    EQEQ = "=="
     ASSIGN = ":="
     GTGT = ">>"
     LTLT = "<<"

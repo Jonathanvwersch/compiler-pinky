@@ -1,4 +1,8 @@
+from typing import List, Tuple
 from tokens import Token, TokenType, keywords
+
+TokenTuple = Tuple[TokenType, str, int]
+Tokens = List[TokenTuple]
 
 
 class Lexer:
@@ -7,7 +11,7 @@ class Lexer:
         self.start = 0
         self.curr = 0
         self.line = 1
-        self.tokens = []
+        self.tokens: Tokens = []
         pass
 
     def advance(self):
@@ -39,7 +43,7 @@ class Lexer:
         self.curr = self.curr + 1
         return True
 
-    def add_token(self, token_type):
+    def add_token(self, token_type: TokenType):
         self.tokens.append(
             Token(token_type, self.source[self.start : self.curr], self.line)
         )
@@ -130,6 +134,8 @@ class Lexer:
                 self.add_token(TokenType.MOD)
             elif ch == "=":
                 if self.match("="):
+                    self.add_token(TokenType.EQEQ)
+                else:
                     self.add_token(TokenType.EQ)
             elif ch == "~":
                 if self.match("="):

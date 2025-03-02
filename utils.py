@@ -1,43 +1,42 @@
 from model import BinOp, Float, Grouping, Integer, UnOp
 
 
-def get_tree_lines(node, level=0):
+def pretty_print_ast(node, prefix="", is_root=True, is_last=True):
     if not node:
-        return []
+        return
 
     if isinstance(node, BinOp):
         node_str = node.op.lexeme
+        left, right = node.left, node.right
     elif isinstance(node, UnOp):
         node_str = node.op.lexeme
+        left, right = node.operand, None
     elif isinstance(node, Grouping):
         node_str = "(group)"
+        left, right = node.value, None
     elif isinstance(node, (Integer, Float)):
-        node_str = node.value
+        node_str = str(node.value)
+        left = right = None
     else:
         node_str = "?"
+        left = right = None
 
-    ## get left and right trees (recursively)
-    left = (
-        get_tree_lines(
-            node.left,
-            level + 1,
-        )
-        if isinstance(node, BinOp)
-        else []
-    )
-    right = get_tree_lines(node.right, level + 1) if isinstance(node, BinOp) else []
+    if is_root:
+        print(f"{prefix}{node_str}")
+    elif is_last:
+        print(f"{prefix}{'└── '}{node_str}")
+    else:
+        print(f"{prefix}{'├── '}{node_str}")
 
-    body = []
+    if is_root:
+        child_prefix = prefix
+    elif is_last:
+        child_prefix = prefix + "    "
+    else:
+        child_prefix = prefix + "│   "
 
-    if left and right:
-        body = left + right
-        print("body", body)
-
-    return [node_str] + body
-
-
-def pretty_print_ast(ast_text):
-    lines = get_tree_lines(ast_text)
-
-    for line in lines:
-        print(line)
+    if isinstance(node, BinOp):
+        pretty_print_ast(left, child_prefix, False, False)
+        pretty_print_ast(right, child_prefix, False, True)
+    elif isinstance(node, (UnOp, Grouping)):
+        pretty_print_ast(left, child_prefix, False, True)

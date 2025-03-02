@@ -67,7 +67,7 @@ class BinOp(Expr):
     def __init__(self, op: Token, left: Expr, right: Expr):
         assert isinstance(op, Token), op
         assert isinstance(left, Expr), left
-        assert isinstance(right, TokenType), right
+        assert isinstance(right, Expr), right
 
         self.op = op
         self.left = left

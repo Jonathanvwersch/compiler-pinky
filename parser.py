@@ -13,10 +13,9 @@ class Parser:
 
     def advance(self):
         if self.is_index_out_of_bounds(self.curr):
-            return
-
+            raise IndexError("Attempted to advance past the end of the token stream.")
         char = self.tokens[self.curr]
-        self.curr = self.curr + 1
+        self.curr += 1
         return char
 
     def peek(self):
@@ -26,13 +25,11 @@ class Parser:
         if self.is_index_out_of_bounds(self.curr + 1):
             return False
 
-        return self.peek().token_type == expected_type
+        return self.tokens[self.curr + 1].token_type == expected_type
 
     def expect(self, expected_type):
         if self.is_index_out_of_bounds(self.curr):
-            raise SyntaxError(
-                f"Found {self.previous_token().lexeme!r} at the end of parsing"
-            )
+            raise SyntaxError(f"Unexpected end of input, expected {expected_type!r}")
         elif self.peek().token_type == expected_type:
             token = self.advance()
             return token
@@ -55,6 +52,7 @@ class Parser:
     # <primary> ::= <integer> | <float> | '(' <expr> ')'
     def primary(self):
         if self.match(TokenType.INTEGER):
+            print(self.curr, Integer(int(self.previous_token().lexeme)))
             return Integer(int(self.previous_token().lexeme))
         if self.match(TokenType.FLOAT):
             return Float(float(self.previous_token().lexeme))
@@ -62,18 +60,21 @@ class Parser:
             expr = self.expr()
             if not self.match(TokenType.RPAREN):
                 raise SyntaxError(f'Error: ")" expected.')
-            else:
-                return Grouping(expr)
+
+            return Grouping(expr)
 
     # <unary> ::= ('+'|'-'|'~') <unary> | primary
     def unary(self):
-        if self.match(
-            TokenType.NOT or self.match(TokenType.MINUS) or self.match(TokenType.PLUS)
+        if (
+            self.match(TokenType.NOT)
+            or self.match(TokenType.MINUS)
+            or self.match(TokenType.PLUS)
         ):
+
             op = self.previous_token()
             operand = self.unary()
             return UnOp(op, operand)
-        return self.primary
+        return self.primary()
 
     # <factor> ::= <unary>
     def factor(self):
@@ -93,7 +94,6 @@ class Parser:
     # <expr> ::= <term> ('+' | '-') <term> )*
     def expr(self):
         expr = self.term()
-
         while self.match(TokenType.PLUS) or self.match(TokenType.MINUS):
             op = self.previous_token()
             right = self.term()

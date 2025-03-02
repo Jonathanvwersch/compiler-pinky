@@ -40,3 +40,12 @@ def pretty_print_ast(node, prefix="", is_root=True, is_last=True):
         pretty_print_ast(right, child_prefix, False, True)
     elif isinstance(node, (UnOp, Grouping)):
         pretty_print_ast(left, child_prefix, False, True)
+
+
+class Colors:
+    WHITE = "\033[0m"
+    BLUE = "\033[94m"
+    CYAN = "\033[96m"
+    GREEN = "\033[92m"
+    YELLOW = "\033[93m"
+    RED = "\033[91m"

@@ -52,7 +52,6 @@ class Parser:
     # <primary> ::= <integer> | <float> | '(' <expr> ')'
     def primary(self):
         if self.match(TokenType.INTEGER):
-            print(self.curr, Integer(int(self.previous_token().lexeme)))
             return Integer(int(self.previous_token().lexeme))
         if self.match(TokenType.FLOAT):
             return Float(float(self.previous_token().lexeme))

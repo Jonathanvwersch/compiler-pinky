@@ -1,6 +1,7 @@
 from typing import List
 from model import *
 from tokens import *
+from utils import parse_error
 
 
 class Parser:
@@ -29,13 +30,17 @@ class Parser:
 
     def expect(self, expected_type):
         if self.is_index_out_of_bounds(self.curr):
-            raise SyntaxError(f"Unexpected end of input, expected {expected_type!r}")
+            parse_error(
+                f"Unexpected end of input, expected {expected_type!r}",
+                self.previous_token().line,
+            )
         elif self.peek().token_type == expected_type:
             token = self.advance()
             return token
         else:
-            raise SyntaxError(
-                f"Expected {expected_type!r}, found {self.peek().lexeme!r}"
+            parse_error(
+                f"Expected {expected_type!r}, found {self.peek().lexeme!r}",
+                self.peek().line,
             )
 
     def match(self, expected_type):
@@ -52,15 +57,19 @@ class Parser:
     # <primary> ::= <integer> | <float> | '(' <expr> ')'
     def primary(self):
         if self.match(TokenType.INTEGER):
-            return Integer(int(self.previous_token().lexeme))
+            return Integer(
+                int(self.previous_token().lexeme), line=self.previous_token().line
+            )
         if self.match(TokenType.FLOAT):
-            return Float(float(self.previous_token().lexeme))
+            return Float(
+                float(self.previous_token().lexeme), line=self.previous_token().line
+            )
         if self.match(TokenType.LPAREN):
             expr = self.expr()
             if not self.match(TokenType.RPAREN):
-                raise SyntaxError(f'Error: ")" expected.')
+                parse_error('Error: ")" expected.', self.previous_token().line)
 
-            return Grouping(expr)
+            return Grouping(expr, line=self.previous_token().line)
 
     # <unary> ::= ('+'|'-'|'~') <unary> | primary
     def unary(self):
@@ -72,32 +81,30 @@ class Parser:
 
             op = self.previous_token()
             operand = self.unary()
-            return UnOp(op, operand)
+            return UnOp(op, operand, line=self.previous_token().line)
         return self.primary()
 
-    # <factor> ::= <unary>
-    def factor(self):
-        return self.unary()
-
-    # <term> ::= <factor> ( ('*'|'/') <factor> )*
-    def term(self):
-        expr = self.factor()
-
+    # <multiplication> ::= <unary> ( ('*'|'/') <unary> )*
+    def multiplication(self):
+        expr = self.unary()
         while self.match(TokenType.STAR) or self.match(TokenType.SLASH):
             op = self.previous_token()
-            right = self.factor()
-            expr = BinOp(op, expr, right)
+            right = self.unary()
+            expr = BinOp(op, expr, right, line=self.previous_token().line)
 
         return expr
 
-    # <expr> ::= <term> ('+' | '-') <term> )*
-    def expr(self):
-        expr = self.term()
+    # <expr> ::= <multiplication> ('+' | '-') <multiplication> )*
+    def addition(self):
+        expr = self.multiplication()
         while self.match(TokenType.PLUS) or self.match(TokenType.MINUS):
             op = self.previous_token()
-            right = self.term()
-            expr = BinOp(op, expr, right)
+            right = self.multiplication()
+            expr = BinOp(op, expr, right, line=self.previous_token().line)
         return expr
+
+    def expr(self):
+        return self.addition()
 
     def parse(self):
         ast = self.expr()

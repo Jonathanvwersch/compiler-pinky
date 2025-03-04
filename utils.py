@@ -42,6 +42,20 @@ def pretty_print_ast(node, prefix="", is_root=True, is_last=True):
         pretty_print_ast(left, child_prefix, False, True)
 
 
+def parse_error(message, line_num):
+    print(f"{Colors.RED}[Line {line_num}]: {message}{Colors.WHITE}")
+    import sys
+
+    sys.exit(1)
+
+
+def lexing_error(message, line_num):
+    print(f"{Colors.RED}[Line {line_num}]: {message}{Colors.WHITE}")
+    import sys
+
+    sys.exit(1)
+
+
 class Colors:
     WHITE = "\033[0m"
     BLUE = "\033[94m"

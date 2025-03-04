@@ -1,5 +1,6 @@
 from typing import List
 from tokens import Token, TokenType, keywords
+from utils import lexing_error
 
 
 class Lexer:
@@ -61,7 +62,7 @@ class Lexer:
             self.advance()
 
         if self.is_index_out_of_bounds():
-            raise SyntaxError(f"Line {self.line}: Unterminated string")
+            lexing_error(f"Out of bounds index exception", self.line)
 
         self.advance()
         self.add_token(TokenType.STRING)
@@ -161,8 +162,9 @@ class Lexer:
             elif ch.isalpha() or ch == "_":
                 self.handle_identifier()
             else:
-                raise SyntaxError(
-                    f"[Line ${self.line}] Error at {ch}: Unexpected character"
+                lexing_error(
+                    f"Unexpected character {ch}",
+                    self.line,
                 )
 
         return self.tokens

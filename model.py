@@ -115,3 +115,31 @@ class IfStat(Stmt):
 
 class ForStat(Stmt):
     pass
+
+
+class Bool(Expr):
+    """
+    Example: true, false
+    """
+
+    def __init__(self, value, line):
+        assert isinstance(value, bool), value
+        self.value = value
+        self.line = line
+
+    def __repr__(self):
+        return f"Grouping({self.value})"
+
+
+class String(Expr):
+    """
+    Example: 'this is a string'
+    """
+
+    def __init__(self, value, line):
+        assert isinstance(value, str), value
+        self.value = value
+        self.line = line
+
+    def __repr__(self):
+        return f"String({self.value})"

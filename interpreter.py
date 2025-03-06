@@ -1,33 +1,176 @@
 from model import *
+from utils import runtime_error
+
+
+TYPE_NUMBER = "TYPE_NUMBER"
+TYPE_STRING = "TYPE_STRING"
+TYPE_BOOL = "TYPE_BOOL"
 
 
 class Interpreter:
-    def __init__(self):
-        pass
-
     def interpret(self, node):
         if isinstance(node, Integer):
-            return node.value
+            return (TYPE_NUMBER, float(node.value))
         elif isinstance(node, Float):
-            return node.value
+            return (TYPE_NUMBER, float(node.value))
+        elif isinstance(node, String):
+            return (TYPE_STRING, str(node.value))
         elif isinstance(node, Grouping):
             return self.interpret(node.value)
+        elif isinstance(node, Bool):
+            return (TYPE_BOOL, node.value)
         elif isinstance(node, BinOp):
-            left_val = self.interpret(node.left)
-            right_val = self.interpret(node.right)
+            left_type, left_val = self.interpret(node.left)
+            right_type, right_val = self.interpret(node.right)
+
             if node.op.token_type == TokenType.PLUS:
-                return left_val + right_val
+                if left_type == TYPE_NUMBER and right_type == TYPE_NUMBER:
+                    return (TYPE_NUMBER, left_val + right_val)
+                elif left_type == TYPE_STRING or right_type == TYPE_STRING:
+                    return (TYPE_STRING, str(left_val) + str(right_val))
+                else:
+                    runtime_error(
+                        f"Unsupported operator {node.op.lexeme} between {left_type} and {right_type}",
+                        node.op.line,
+                    )
+            if node.op.token_type == TokenType.GT:
+                if (
+                    left_type == TYPE_NUMBER
+                    and right_type == TYPE_NUMBER
+                    or (left_type == TYPE_STRING and right_type == TYPE_STRING)
+                ):
+                    return (TYPE_BOOL, left_val > right_val)
+                else:
+                    runtime_error(
+                        f"Unsupported operator {node.op.lexeme} between {left_type} and {right_type}",
+                        node.op.line,
+                    )
+            if node.op.token_type == TokenType.GE:
+                if (
+                    left_type == TYPE_NUMBER
+                    and right_type == TYPE_NUMBER
+                    or (left_type == TYPE_STRING and right_type == TYPE_STRING)
+                ):
+                    return (TYPE_BOOL, left_val >= right_val)
+                else:
+                    runtime_error(
+                        f"Unsupported operator {node.op.lexeme} between {left_type} and {right_type}",
+                        node.op.line,
+                    )
+            if node.op.token_type == TokenType.LE:
+                if (
+                    left_type == TYPE_NUMBER
+                    and right_type == TYPE_NUMBER
+                    or (left_type == TYPE_STRING and right_type == TYPE_STRING)
+                ):
+                    return (TYPE_BOOL, left_val <= right_val)
+                else:
+                    runtime_error(
+                        f"Unsupported operator {node.op.lexeme} between {left_type} and {right_type}",
+                        node.op.line,
+                    )
+
+            if node.op.token_type == TokenType.LT:
+                if (
+                    left_type == TYPE_NUMBER
+                    and right_type == TYPE_NUMBER
+                    or (left_type == TYPE_STRING and right_type == TYPE_STRING)
+                ):
+                    return (TYPE_BOOL, left_val < right_val)
+                else:
+                    runtime_error(
+                        f"Unsupported operator {node.op.lexeme} between {left_type} and {right_type}",
+                        node.op.line,
+                    )
+
+            if node.op.token_type == TokenType.EQEQ:
+                if (
+                    left_type == TYPE_NUMBER
+                    and right_type == TYPE_NUMBER
+                    or (left_type == TYPE_STRING and right_type == TYPE_STRING)
+                ):
+                    return (TYPE_BOOL, left_val == right_val)
+                else:
+                    runtime_error(
+                        f"Unsupported operator {node.op.lexeme} between {left_type} and {right_type}",
+                        node.op.line,
+                    )
+
+            if node.op.token_type == TokenType.NE:
+                if (
+                    left_type == TYPE_NUMBER
+                    and right_type == TYPE_NUMBER
+                    or (left_type == TYPE_STRING and right_type == TYPE_STRING)
+                ):
+                    return (TYPE_BOOL, left_val != right_val)
+                else:
+                    runtime_error(
+                        f"Unsupported operator {node.op.lexeme} between {left_type} and {right_type}",
+                        node.op.line,
+                    )
+
             if node.op.token_type == TokenType.STAR:
-                return left_val * right_val
+                if left_type == TYPE_NUMBER and right_type == TYPE_NUMBER:
+                    return (TYPE_NUMBER, left_val * right_val)
+                else:
+                    runtime_error(
+                        f"Unsupported operator {node.op.lexeme} between {left_type} and {right_type}",
+                        node.op.line,
+                    )
+
             if node.op.token_type == TokenType.MINUS:
-                return left_val - right_val
+                if left_type == TYPE_NUMBER and right_type == TYPE_NUMBER:
+                    return (TYPE_NUMBER, left_val - right_val)
+                else:
+                    runtime_error(
+                        f"Unsupported operator {node.op.lexeme} between {left_type} and {right_type}",
+                        node.op.line,
+                    )
             if node.op.token_type == TokenType.SLASH:
-                return left_val / right_val
+                if left_type == TYPE_NUMBER and right_type == TYPE_NUMBER:
+                    return (TYPE_NUMBER, left_val / right_val)
+                else:
+                    runtime_error(
+                        f"Unsupported operator {node.op.lexeme} between {left_type} and {right_type}",
+                        node.op.line,
+                    )
+            if node.op.token_type == TokenType.MOD:
+                if left_type == TYPE_NUMBER and right_type == TYPE_NUMBER:
+                    return (TYPE_NUMBER, left_val % right_val)
+                else:
+                    runtime_error(
+                        f"Unsupported operator {node.op.lexeme} between {left_type} and {right_type}",
+                        node.op.line,
+                    )
+            if node.op.token_type == TokenType.CARET:
+                if left_type == TYPE_NUMBER and right_type == TYPE_NUMBER:
+                    return (TYPE_NUMBER, left_val**right_val)
+                else:
+                    runtime_error(
+                        f"Unsupported operator {node.op.lexeme} between {left_type} and {right_type}",
+                        node.op.line,
+                    )
+
         elif isinstance(node, UnOp):
-            operand = self.interpret(node.operand)
+            operand_type, operand_val = self.interpret(node.operand)
             if node.op.token_type == TokenType.PLUS:
-                return +operand
+                if operand_type == TYPE_NUMBER:
+                    return (TYPE_NUMBER, +operand_val)
+                else:
+                    runtime_error(
+                        f"Unsupported operator {node.op.lexeme} with {operand_type}",
+                    )
             if node.op.token_type == TokenType.MINUS:
-                return -operand
-            # if node.op.token_type == TokenType.NOT:
-            #     return ~operand
+                if operand_type == TYPE_NUMBER:
+                    return (TYPE_NUMBER, -operand_val)
+                else:
+                    runtime_error(
+                        f"Unsupported operator {node.op.lexeme} with {operand_type}",
+                    )
+            if node.op.token_type == TokenType.NOT:
+                if operand_type == TYPE_BOOL:
+                    return (TYPE_NUMBER, not operand_val)
+                else:
+                    runtime_error(
+                        f"Unsupported operator {node.op.lexeme} {operand_type}",
+                    )

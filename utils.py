@@ -56,6 +56,10 @@ def lexing_error(message, line_num):
     sys.exit(1)
 
 
+def runtime_error(message, line_num):
+    print(f"{Colors.RED}[Line {line_num}]: {message}{Colors.WHITE}")
+
+
 class Colors:
     WHITE = "\033[0m"
     BLUE = "\033[94m"

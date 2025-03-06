@@ -54,7 +54,7 @@ class Parser:
     def previous_token(self):
         return self.tokens[self.curr - 1]
 
-    # <primary> ::= <integer> | <float> | '(' <expr> ')'
+    # <primary> ::= <integer> | <float> | '(' <expr> ') | <bool> | <string>'
     def primary(self):
         if self.match(TokenType.INTEGER):
             return Integer(
@@ -64,6 +64,19 @@ class Parser:
             return Float(
                 float(self.previous_token().lexeme), line=self.previous_token().line
             )
+
+        if self.match(TokenType.TRUE):
+            return Bool(True, line=self.previous_token().line)
+
+        if self.match(TokenType.STRING):
+            # remove quotes from string during lexing
+            return String(
+                str(self.previous_token().lexeme[1:-1]), line=self.previous_token().line
+            )
+
+        if self.match(TokenType.FALSE):
+            return Bool(False, line=self.previous_token().line)
+
         if self.match(TokenType.LPAREN):
             expr = self.expr()
             if not self.match(TokenType.RPAREN):

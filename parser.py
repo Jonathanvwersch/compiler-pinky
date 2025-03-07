@@ -20,6 +20,8 @@ class Parser:
         return char
 
     def peek(self):
+        if self.is_index_out_of_bounds(self.curr):
+            return
         return self.tokens[self.curr]
 
     def is_next(self, expected_type):
@@ -84,26 +86,45 @@ class Parser:
 
             return Grouping(expr, line=self.previous_token().line)
 
-    # <unary> ::= ('+'|'-'|'~') <unary> | primary
+    # <exponent> ::= <primary> ( "^" <primary> )*
+    def exponent(self):
+        expr = self.primary()
+        while self.match(TokenType.CARET):
+            op = self.previous_token()
+            right = self.exponent()
+            expr = BinOp(op, expr, right, line=op.line)
+        return expr
+
+    # <unary> ::= ('+'|'-'|'~')* <exponent>
     def unary(self):
         if (
             self.match(TokenType.NOT)
             or self.match(TokenType.MINUS)
             or self.match(TokenType.PLUS)
         ):
-
             op = self.previous_token()
             operand = self.unary()
-            return UnOp(op, operand, line=self.previous_token().line)
-        return self.primary()
+            return UnOp(op, operand, line=op.line)
+        return self.exponent()
+
+    # <modulo> ::= <unary> ( "%" <unary> )*
+    def modulo(self):
+        expr = self.unary()
+
+        while self.match(TokenType.MOD):
+            op = self.previous_token()
+            right = self.unary()
+            expr = BinOp(op, expr, right, line=op.line)
+
+        return expr
 
     # <multiplication> ::= <unary> ( ('*'|'/') <unary> )*
     def multiplication(self):
-        expr = self.unary()
+        expr = self.modulo()
         while self.match(TokenType.STAR) or self.match(TokenType.SLASH):
             op = self.previous_token()
-            right = self.unary()
-            expr = BinOp(op, expr, right, line=self.previous_token().line)
+            right = self.modulo()
+            expr = BinOp(op, expr, right, line=op.line)
 
         return expr
 
@@ -113,11 +134,34 @@ class Parser:
         while self.match(TokenType.PLUS) or self.match(TokenType.MINUS):
             op = self.previous_token()
             right = self.multiplication()
-            expr = BinOp(op, expr, right, line=self.previous_token().line)
+            expr = BinOp(op, expr, right, line=op.line)
+        return expr
+
+    # <comparison> ::= <addition> (( ">" | ">=" | "<" | "<=" ) <addition>)*
+    def comparison(self):
+        expr = self.addition()
+        while (
+            self.match(TokenType.LT)
+            or self.match(TokenType.GE)
+            or self.match(TokenType.GT)
+            or self.match(TokenType.LE)
+        ):
+            op = self.previous_token()
+            right = self.addition()
+            expr = BinOp(op, expr, right, line=op.line)
+        return expr
+
+    # <equality> ::= <comparison> ( ( "~=" | "==" ) <comparison> )*
+    def equality(self):
+        expr = self.comparison()
+        while self.match(TokenType.NE) or self.match(TokenType.EQEQ):
+            op = self.previous_token()
+            right = self.comparison()
+            expr = BinOp(op, expr, right, line=op.line)
         return expr
 
     def expr(self):
-        return self.addition()
+        return self.equality()
 
     def parse(self):
         ast = self.expr()

@@ -88,6 +88,7 @@ class Interpreter:
                     left_type == TYPE_NUMBER
                     and right_type == TYPE_NUMBER
                     or (left_type == TYPE_STRING and right_type == TYPE_STRING)
+                    or (left_type == TYPE_BOOL and right_type == TYPE_BOOL)
                 ):
                     return (TYPE_BOOL, left_val == right_val)
                 else:
@@ -159,6 +160,7 @@ class Interpreter:
                 else:
                     runtime_error(
                         f"Unsupported operator {node.op.lexeme} with {operand_type}",
+                        node.op.line,
                     )
             if node.op.token_type == TokenType.MINUS:
                 if operand_type == TYPE_NUMBER:
@@ -166,11 +168,13 @@ class Interpreter:
                 else:
                     runtime_error(
                         f"Unsupported operator {node.op.lexeme} with {operand_type}",
+                        node.op.line,
                     )
             if node.op.token_type == TokenType.NOT:
                 if operand_type == TYPE_BOOL:
-                    return (TYPE_NUMBER, not operand_val)
+                    return (TYPE_BOOL, not operand_val)
                 else:
                     runtime_error(
                         f"Unsupported operator {node.op.lexeme} {operand_type}",
+                        node.op.line,
                     )

@@ -151,6 +151,26 @@ class Interpreter:
                         f"Unsupported operator {node.op.lexeme} between {left_type} and {right_type}",
                         node.op.line,
                     )
+        elif isinstance(node, LogicalOp):
+            left_type, left_val = self.interpret(node.left)
+            right_type, right_val = self.interpret(node.right)
+
+            if node.op.token_type == TokenType.OR:
+                if left_type == TYPE_BOOL and right_type == TYPE_BOOL:
+                    return (TYPE_BOOL, left_val or right_val)
+                else:
+                    runtime_error(
+                        f"Unsupported operator {node.op.lexeme} between {left_type} and {right_type}",
+                        node.op.line,
+                    )
+            if node.op.token_type == TokenType.AND:
+                if left_type == TYPE_BOOL and right_type == TYPE_BOOL:
+                    return (TYPE_BOOL, left_val and right_val)
+                else:
+                    runtime_error(
+                        f"Unsupported operator {node.op.lexeme} between {left_type} and {right_type}",
+                        node.op.line,
+                    )
 
         elif isinstance(node, UnOp):
             operand_type, operand_val = self.interpret(node.operand)

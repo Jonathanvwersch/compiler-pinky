@@ -1,4 +1,4 @@
-from model import BinOp, Float, Grouping, Integer, UnOp
+from model import BinOp, Float, Grouping, Integer, LogicalOp, UnOp
 
 
 def pretty_print_ast(node, prefix="", is_root=True, is_last=True):
@@ -14,6 +14,9 @@ def pretty_print_ast(node, prefix="", is_root=True, is_last=True):
     elif isinstance(node, Grouping):
         node_str = "(group)"
         left, right = node.value, None
+    elif isinstance(node, LogicalOp):
+        node_str = node.op.lexeme
+        left, right = node.left, node.right
     elif isinstance(node, (Integer, Float)):
         node_str = str(node.value)
         left = right = None
@@ -35,7 +38,7 @@ def pretty_print_ast(node, prefix="", is_root=True, is_last=True):
     else:
         child_prefix = prefix + "│   "
 
-    if isinstance(node, BinOp):
+    if isinstance(node, (LogicalOp, BinOp)):
         pretty_print_ast(left, child_prefix, False, False)
         pretty_print_ast(right, child_prefix, False, True)
     elif isinstance(node, (UnOp, Grouping)):

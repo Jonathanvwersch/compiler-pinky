@@ -128,6 +128,8 @@ class Interpreter:
                         node.op.line,
                     )
             if node.op.token_type == TokenType.SLASH:
+                if right_val == 0:
+                    runtime_error(f"Division by zero.", node.line)
                 if left_type == TYPE_NUMBER and right_type == TYPE_NUMBER:
                     return (TYPE_NUMBER, left_val / right_val)
                 else:
@@ -153,24 +155,15 @@ class Interpreter:
                     )
         elif isinstance(node, LogicalOp):
             left_type, left_val = self.interpret(node.left)
-            right_type, right_val = self.interpret(node.right)
 
             if node.op.token_type == TokenType.OR:
-                if left_type == TYPE_BOOL and right_type == TYPE_BOOL:
-                    return (TYPE_BOOL, left_val or right_val)
-                else:
-                    runtime_error(
-                        f"Unsupported operator {node.op.lexeme} between {left_type} and {right_type}",
-                        node.op.line,
-                    )
-            if node.op.token_type == TokenType.AND:
-                if left_type == TYPE_BOOL and right_type == TYPE_BOOL:
-                    return (TYPE_BOOL, left_val and right_val)
-                else:
-                    runtime_error(
-                        f"Unsupported operator {node.op.lexeme} between {left_type} and {right_type}",
-                        node.op.line,
-                    )
+                if left_val:
+                    return (left_type, left_val)
+            elif node.op.token_type == TokenType.AND:
+                if not left_val:
+                    return (left_type, left_val)
+
+            return self.interpret(node.right)
 
         elif isinstance(node, UnOp):
             operand_type, operand_val = self.interpret(node.operand)

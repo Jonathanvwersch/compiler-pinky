@@ -178,6 +178,22 @@ class Parser:
 
     def expr(self):
         return self.logical_or()
+    
+    def stmt(self):
+        # TODO:
+        # parse print, if, while, for assignement, function call, etc
+        
+    
+    def stmts(self):
+        stmts = []
+        # TODO: loop all the statements, creating Stmt() for each one
+        while self.curr < len(self.tokens):
+            stmt = self.stmt()
+            stmts.append(stmt)
+        return Stmts(stmts, line=self.previous_token().line)
+        
+    def program(self):
+        return self.stmts()
 
     def parse(self):
         ast = self.expr()

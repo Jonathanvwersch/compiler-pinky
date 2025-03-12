@@ -178,23 +178,40 @@ class Parser:
 
     def expr(self):
         return self.logical_or()
-    
+
+    # <print_stmt> ::= "print" <expr>
+    def print_stmt(self):
+        if self.match(TokenType.PRINT):
+            val = self.expr()
+            return PrintStmt(val, line=self.previous_token().line)
+
     def stmt(self):
-        # TODO:
-        # parse print, if, while, for assignement, function call, etc
-        
-    
+        # predictive parsing, where the next token predicts what is the next statement
+        if self.peek().token_type == TokenType.PRINT:
+            return self.print_stmt()
+        # elif self.peek().token_type == TokenType.IF:
+        #     return self.if_stmt()
+        # elif self.peek().token_type == TokenType.WHILE:
+        #     return self.if_stmt()
+        # elif self.peek().token_type == TokenType.FOR:
+        #     return self.if_stmt()
+        # elif self.peek().token_type == TokenType.FUNC:
+        #     return self.if_stmt()
+        # else:
+        #     pass
+
     def stmts(self):
         stmts = []
         # TODO: loop all the statements, creating Stmt() for each one
         while self.curr < len(self.tokens):
             stmt = self.stmt()
             stmts.append(stmt)
+
         return Stmts(stmts, line=self.previous_token().line)
-        
+
     def program(self):
         return self.stmts()
 
     def parse(self):
-        ast = self.expr()
+        ast = self.program()
         return ast

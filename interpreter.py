@@ -191,3 +191,6 @@ class Interpreter:
                         f"Unsupported operator {node.op.lexeme} {operand_type}",
                         node.op.line,
                     )
+        elif isinstance(node, Stmts):
+            for stat in node.stmts:
+                self.interpret(stmt)

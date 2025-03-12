@@ -164,7 +164,7 @@ class String(Expr):
         return f"String({self.value})"
 
 
-def Stmts(Node):
+class Stmts(Node):
     """
     A list of statements
     """
@@ -176,3 +176,17 @@ def Stmts(Node):
 
     def __repr__(self):
         return f"Stmts({self.stmts})"
+
+
+class PrintStmt(Stmt):
+    """
+    Example: print value
+    """
+
+    def __init__(self, value, line):
+        assert isinstance(value, Expr), value
+        self.value = value
+        self.line = line
+
+    def __repr__(self):
+        return f"PrintStmt({self.value})"

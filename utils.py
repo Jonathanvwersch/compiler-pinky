@@ -1,4 +1,14 @@
-from model import BinOp, Float, Grouping, Integer, LogicalOp, UnOp
+from model import (
+    BinOp,
+    Float,
+    Grouping,
+    Integer,
+    LogicalOp,
+    PrintStmt,
+    Stmts,
+    String,
+    UnOp,
+)
 
 
 def pretty_print_ast(node, prefix="", is_root=True, is_last=True):
@@ -6,20 +16,34 @@ def pretty_print_ast(node, prefix="", is_root=True, is_last=True):
         return
 
     if isinstance(node, BinOp):
-        node_str = node.op.lexeme
+        node_str = f"BinOp({node.op.lexeme})"
         left, right = node.left, node.right
     elif isinstance(node, UnOp):
-        node_str = node.op.lexeme
+        node_str = f"UnOp({node.op.lexeme})"
         left, right = node.operand, None
     elif isinstance(node, Grouping):
-        node_str = "(group)"
+        node_str = "Grouping"
         left, right = node.value, None
     elif isinstance(node, LogicalOp):
-        node_str = node.op.lexeme
+        node_str = f"LogicalOp({node.op.lexeme})"
         left, right = node.left, node.right
-    elif isinstance(node, (Integer, Float)):
-        node_str = str(node.value)
+    elif isinstance(node, Integer):
+        node_str = f"Integer({node.value})"
         left = right = None
+    elif isinstance(node, Float):
+        node_str = f"Float({node.value})"
+        left = right = None
+    elif isinstance(node, String):
+        node_str = f"String({repr(node.value)})"
+        left = right = None
+    elif isinstance(node, Stmts):
+        for stmt in node.stmts:
+            pretty_print_ast(stmt)
+        return  # No need to print anything at this level
+    elif isinstance(node, PrintStmt):
+        print("PrintStmt")
+        pretty_print_ast(node.value, prefix + "    ", False, True)
+        return
     else:
         node_str = "?"
         left = right = None
@@ -27,9 +51,9 @@ def pretty_print_ast(node, prefix="", is_root=True, is_last=True):
     if is_root:
         print(f"{prefix}{node_str}")
     elif is_last:
-        print(f"{prefix}{'└── '}{node_str}")
+        print(f"{prefix}└── {node_str}")
     else:
-        print(f"{prefix}{'├── '}{node_str}")
+        print(f"{prefix}├── {node_str}")
 
     if is_root:
         child_prefix = prefix

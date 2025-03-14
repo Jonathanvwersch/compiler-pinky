@@ -1,3 +1,4 @@
+import codecs
 from model import *
 from utils import runtime_error
 
@@ -192,5 +193,14 @@ class Interpreter:
                         node.op.line,
                     )
         elif isinstance(node, Stmts):
-            for stat in node.stmts:
+            for stmt in node.stmts:
                 self.interpret(stmt)
+
+        elif isinstance(node, PrintStmt):
+            _, expr_value = self.interpret(node.value)
+            print(
+                codecs.escape_decode(bytes(str(expr_value), "utf-8"))[0].decode(
+                    "utf-8"
+                ),
+                end=node.end,
+            )

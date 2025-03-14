@@ -180,15 +180,17 @@ class Parser:
         return self.logical_or()
 
     # <print_stmt> ::= "print" <expr>
-    def print_stmt(self):
-        if self.match(TokenType.PRINT):
+    def print_stmt(self, end):
+        if self.match(TokenType.PRINT) or self.match(TokenType.PRINTLN):
             val = self.expr()
-            return PrintStmt(val, line=self.previous_token().line)
+            return PrintStmt(val, end, line=self.previous_token().line)
 
     def stmt(self):
         # predictive parsing, where the next token predicts what is the next statement
         if self.peek().token_type == TokenType.PRINT:
-            return self.print_stmt()
+            return self.print_stmt(end="")
+        if self.peek().token_type == TokenType.PRINTLN:
+            return self.print_stmt(end="\n")
         # elif self.peek().token_type == TokenType.IF:
         #     return self.if_stmt()
         # elif self.peek().token_type == TokenType.WHILE:

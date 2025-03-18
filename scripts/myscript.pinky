@@ -1,7 +1,9 @@
 --------------------------------------
 -- Simple expression
 --------------------------------------
-print 1 + 2
-print 3 * 2^2
-println("test2")
-print("test")
+-- Simple if 
+if 5 > 2 then
+    println("Entered then")
+else
+    println("Entered else")
+end

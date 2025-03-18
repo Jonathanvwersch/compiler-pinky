@@ -36,14 +36,16 @@ class Parser:
                 f"Unexpected end of input, expected {expected_type!r}",
                 self.previous_token().line,
             )
-        elif self.peek().token_type == expected_type:
-            token = self.advance()
-            return token
-        else:
-            parse_error(
-                f"Expected {expected_type!r}, found {self.peek().lexeme!r}",
-                self.peek().line,
-            )
+            raise RuntimeError("Parsing error")
+
+        if self.peek().token_type == expected_type:
+            return self.advance()
+
+        parse_error(
+            f"Expected {expected_type!r}, found {self.peek().lexeme!r}",
+            self.peek().line,
+        )
+        raise RuntimeError("Parsing error")
 
     def match(self, expected_type):
         if self.is_index_out_of_bounds(self.curr):
@@ -185,30 +187,47 @@ class Parser:
             val = self.expr()
             return PrintStmt(val, end, line=self.previous_token().line)
 
+    # <if_stmt> ::= "if" <expr> "then" <stmts> ( "else" <stmts> )? "end"
+    def if_stmt(self):
+        self.expect(TokenType.IF)
+        test = self.expr()
+        self.expect(TokenType.THEN)
+        then_stmts = self.stmts()
+        if self.is_next(TokenType.ELSE):
+            self.advance()
+            else_stmts = self.stmts()
+        else:
+            else_stmts = None
+
+        self.expect(TokenType.END)
+        return IfStmt(test, then_stmts, else_stmts, line=self.previous_token().line)
+
     def stmt(self):
         # predictive parsing, where the next token predicts what is the next statement
         if self.peek().token_type == TokenType.PRINT:
             return self.print_stmt(end="")
         if self.peek().token_type == TokenType.PRINTLN:
             return self.print_stmt(end="\n")
-        # elif self.peek().token_type == TokenType.IF:
-        #     return self.if_stmt()
+        if self.peek().token_type == TokenType.IF:
+            return self.if_stmt()
         # elif self.peek().token_type == TokenType.WHILE:
         #     return self.if_stmt()
         # elif self.peek().token_type == TokenType.FOR:
         #     return self.if_stmt()
         # elif self.peek().token_type == TokenType.FUNC:
         #     return self.if_stmt()
-        # else:
-        #     pass
+        pass
 
     def stmts(self):
         stmts = []
-        # TODO: loop all the statements, creating Stmt() for each one
-        while self.curr < len(self.tokens):
+        # Loop all statements of the current block (meaning until we find an "end", or "else", or EOF
+        while (
+            self.curr < len(self.tokens)
+            and not self.is_next(TokenType.ELSE)
+            and not self.is_next(TokenType.END)
+        ):
             stmt = self.stmt()
             stmts.append(stmt)
-
         return Stmts(stmts, line=self.previous_token().line)
 
     def program(self):

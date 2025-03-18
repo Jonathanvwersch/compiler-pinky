@@ -195,7 +195,6 @@ class Interpreter:
         elif isinstance(node, Stmts):
             for stmt in node.stmts:
                 self.interpret(stmt)
-
         elif isinstance(node, PrintStmt):
             _, expr_value = self.interpret(node.value)
             print(
@@ -204,3 +203,11 @@ class Interpreter:
                 ),
                 end=node.end,
             )
+        elif isinstance(node, IfStmt):
+            test_type, test_val = self.interpret(node.test)
+            if test_type != TYPE_BOOL:
+                runtime_error("Condition test is not a boolean expression", node.line)
+            if test_val:
+                self.interpret(node.then_stmts)
+            else:
+                self.interpret(node.else_stmts)

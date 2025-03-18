@@ -120,22 +120,6 @@ class Grouping(Expr):
         return f"Grouping({self.value})"
 
 
-class WhileStmt(Stmt):
-    pass
-
-
-class Assignment(Stmt):
-    pass
-
-
-class IfStat(Stmt):
-    pass
-
-
-class ForStat(Stmt):
-    pass
-
-
 class Bool(Expr):
     """
     Example: true, false
@@ -191,3 +175,21 @@ class PrintStmt(Stmt):
 
     def __repr__(self):
         return f"PrintStmt({self.value}), end={self.end!r}"
+
+
+class IfStmt(Stmt):
+    """
+    "if" <expr> "then" <then_stmts> ("else" <else_stmts>)? "end"
+    """
+
+    def __init__(self, test, then_stmts, else_stmts, line):
+        assert isinstance(test, Expr), test
+        assert isinstance(then_stmts, Stmts), then_stmts
+        assert else_stmts is None or isinstance(else_stmts, Stmts), else_stmts
+        self.test = test
+        self.then_stmts = then_stmts
+        self.else_stmts = else_stmts
+        self.line = line
+
+    def __repr__(self):
+        return f"IfStmt({self.test}, then:{self.then_stmts}, else:{self.else_stmts})"

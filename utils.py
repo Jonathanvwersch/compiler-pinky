@@ -2,6 +2,7 @@ from model import (
     BinOp,
     Float,
     Grouping,
+    IfStmt,
     Integer,
     LogicalOp,
     PrintStmt,
@@ -30,6 +31,43 @@ def pretty_print_ast(node, prefix="", is_root=True, is_last=True):
     elif isinstance(node, Integer):
         node_str = f"Integer({node.value})"
         left = right = None
+    elif isinstance(node, IfStmt):
+        if is_root:
+            print(f"{prefix}IfStmt")
+        elif is_last:
+            print(f"{prefix}└── IfStmt")
+        else:
+            print(f"{prefix}├── IfStmt")
+
+        if is_root:
+            child_prefix = prefix
+        elif is_last:
+            child_prefix = prefix + "    "
+        else:
+            child_prefix = prefix + "│   "
+
+        print(f"{child_prefix}├── Condition:")
+        pretty_print_ast(node.test, child_prefix + "│   ", False, True)
+
+        print(f"{child_prefix}├── Then:")
+        if isinstance(node.then_stmts, Stmts):
+            then_stmts_prefix = child_prefix + "│   "
+            for i, stmt in enumerate(node.then_stmts.stmts):
+                is_last_stmt = i == len(node.then_stmts.stmts) - 1
+                pretty_print_ast(stmt, then_stmts_prefix, False, is_last_stmt)
+        else:
+            pretty_print_ast(node.then_stmts, child_prefix + "│   ", False, True)
+
+        print(f"{child_prefix}└── Else:")
+        if isinstance(node.else_stmts, Stmts):
+            else_stmts_prefix = child_prefix + "    "
+            for i, stmt in enumerate(node.else_stmts.stmts):
+                is_last_stmt = i == len(node.else_stmts.stmts) - 1
+                pretty_print_ast(stmt, else_stmts_prefix, False, is_last_stmt)
+        else:
+            pretty_print_ast(node.else_stmts, child_prefix + "    ", False, True)
+
+        return
     elif isinstance(node, Float):
         node_str = f"Float({node.value})"
         left = right = None
@@ -37,12 +75,26 @@ def pretty_print_ast(node, prefix="", is_root=True, is_last=True):
         node_str = f"String({repr(node.value)})"
         left = right = None
     elif isinstance(node, Stmts):
-        for stmt in node.stmts:
-            pretty_print_ast(stmt)
-        return  # No need to print anything at this level
+        for i, stmt in enumerate(node.stmts):
+            is_last_stmt = i == len(node.stmts) - 1
+            pretty_print_ast(stmt, prefix, is_root, is_last_stmt)
+        return
     elif isinstance(node, PrintStmt):
-        print("PrintStmt")
-        pretty_print_ast(node.value, prefix + "    ", False, True)
+        if is_root:
+            print(f"{prefix}PrintStmt")
+        elif is_last:
+            print(f"{prefix}└── PrintStmt")
+        else:
+            print(f"{prefix}├── PrintStmt")
+
+        if is_root:
+            child_prefix = prefix
+        elif is_last:
+            child_prefix = prefix + "    "
+        else:
+            child_prefix = prefix + "│   "
+
+        pretty_print_ast(node.value, child_prefix, False, True)
         return
     else:
         node_str = "?"

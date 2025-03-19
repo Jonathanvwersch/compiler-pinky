@@ -1,6 +1,7 @@
 --------------------------------------
 -- Simple expression
 --------------------------------------
+println 1 + 2
 -- Simple if 
 if 5 > 2 then
     println("Entered then")

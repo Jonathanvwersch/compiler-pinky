@@ -1,7 +1,9 @@
 from model import (
+    Assignment,
     BinOp,
     Float,
     Grouping,
+    Identifier,
     IfStmt,
     Integer,
     LogicalOp,
@@ -31,6 +33,12 @@ def pretty_print_ast(node, prefix="", is_root=True, is_last=True):
     elif isinstance(node, Integer):
         node_str = f"Integer({node.value})"
         left = right = None
+    elif isinstance(node, Assignment):
+        node_str = "Assignment"
+        pretty_print_ast(node.left)
+        pretty_print_ast(node.right)
+    elif isinstance(node, Identifier):
+        node_str = f"Identifier({node})"
     elif isinstance(node, IfStmt):
         if is_root:
             print(f"{prefix}IfStmt")

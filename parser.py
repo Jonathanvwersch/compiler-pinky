@@ -85,6 +85,9 @@ class Parser:
                 parse_error(f'Error: ")" expected.', self.previous_token().line)
             else:
                 return Grouping(expr, line=self.previous_token().line)
+        else:
+            identifier = self.expect(TokenType.IDENTIFIER)
+            return Identifier(identifier.lexeme, line=self.previous_token().line)
 
     # <exponent> ::= <primary> ( "^" <exponent> )*
     def exponent(self):
@@ -214,7 +217,11 @@ class Parser:
         # elif self.peek().token_type == TokenType.FUNC:
         #  return self.func_decl()
         else:
-            # TODO: What do we need to handle inside this 'else' statement?
+            # Assignment
+            left = self.expr()
+            if self.match(TokenType.ASSIGN):
+                right = self.expr()
+                return Assignment(left, right, line=self.previous_token().line)
             pass
 
     def stmts(self):

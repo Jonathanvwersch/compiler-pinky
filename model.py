@@ -193,3 +193,35 @@ class IfStmt(Stmt):
 
     def __repr__(self):
         return f"IfStmt({self.test}, then:{self.then_stmts}, else:{self.else_stmts})"
+
+
+class Identifier(Expr):
+    """
+    Example: x, PI, y
+    """
+
+    def __init__(self, name, line):
+        assert isinstance(name, str), name
+        self.name = name
+        self.line = line
+
+    def __repr__(self):
+        return f"Identifier({self.name})"
+
+
+class Assignment(Stmt):
+    """
+    left := right
+    x := 12 + 34 + (3 - y)
+    12 := x
+    """
+
+    def __init__(self, left, right, line):
+        assert isinstance(left, Expr), left
+        assert isinstance(right, Expr), right
+        self.left = left
+        self.right = right
+        self.line = line
+
+    def __repr__(self):
+        return f"Assignment(left: {self.left}, right: {self.right})"

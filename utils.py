@@ -34,11 +34,31 @@ def pretty_print_ast(node, prefix="", is_root=True, is_last=True):
         node_str = f"Integer({node.value})"
         left = right = None
     elif isinstance(node, Assignment):
-        node_str = "Assignment"
-        pretty_print_ast(node.left)
-        pretty_print_ast(node.right)
+        if is_root:
+            print(f"{prefix}Assignment")
+        elif is_last:
+            print(f"{prefix}└── Assignment")
+        else:
+            print(f"{prefix}├── Assignment")
+
+        if is_root:
+            child_prefix = prefix
+        elif is_last:
+            child_prefix = prefix + "    "
+        else:
+            child_prefix = prefix + "│   "
+
+        # Print left (identifier) and right (value) parts of assignment
+        print(f"{child_prefix}├── Name:")
+        pretty_print_ast(node.left, child_prefix + "│   ", False, True)
+
+        print(f"{child_prefix}└── Value:")
+        pretty_print_ast(node.right, child_prefix + "    ", False, True)
+
+        return  # Add return to prevent fallthrough
     elif isinstance(node, Identifier):
-        node_str = f"Identifier({node})"
+        node_str = f"Identifier({node.name})"  # Assuming name is the attribute to print
+        left = right = None
     elif isinstance(node, IfStmt):
         if is_root:
             print(f"{prefix}IfStmt")

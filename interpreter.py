@@ -1,5 +1,6 @@
 import codecs
 from model import *
+from state import Environment
 from utils import runtime_error
 
 
@@ -9,7 +10,7 @@ TYPE_BOOL = "TYPE_BOOL"
 
 
 class Interpreter:
-    def interpret(self, node):
+    def interpret(self, node, env):
         if isinstance(node, Integer):
             return (TYPE_NUMBER, float(node.value))
         elif isinstance(node, Float):
@@ -17,12 +18,24 @@ class Interpreter:
         elif isinstance(node, String):
             return (TYPE_STRING, str(node.value))
         elif isinstance(node, Grouping):
-            return self.interpret(node.value)
+            return self.interpret(node.value, env)
+        elif isinstance(node, Identifier):
+            value = env.get_var(node.name)
+            if value is None:
+                runtime_error(f"Undeclared identifier {node.name!r}", node.line)
+            if value[1] is None:
+                runtime_error(f"Uninitialized identifier {node.name!r}", node.line)
+            return value
+        elif isinstance(node, Assignment):
+            right_type, right_val = self.interpret(node.right, env)
+
+            env.set_var(node.left.name, (right_type, right_val))
+
         elif isinstance(node, Bool):
             return (TYPE_BOOL, node.value)
         elif isinstance(node, BinOp):
-            left_type, left_val = self.interpret(node.left)
-            right_type, right_val = self.interpret(node.right)
+            left_type, left_val = self.interpret(node.left, env)
+            right_type, right_val = self.interpret(node.right, env)
 
             if node.op.token_type == TokenType.PLUS:
                 if left_type == TYPE_NUMBER and right_type == TYPE_NUMBER:
@@ -155,7 +168,7 @@ class Interpreter:
                         node.op.line,
                     )
         elif isinstance(node, LogicalOp):
-            left_type, left_val = self.interpret(node.left)
+            left_type, left_val = self.interpret(node.left, env)
 
             if node.op.token_type == TokenType.OR:
                 if left_val:
@@ -167,7 +180,7 @@ class Interpreter:
             return self.interpret(node.right)
 
         elif isinstance(node, UnOp):
-            operand_type, operand_val = self.interpret(node.operand)
+            operand_type, operand_val = self.interpret(node.operand, env)
             if node.op.token_type == TokenType.PLUS:
                 if operand_type == TYPE_NUMBER:
                     return (TYPE_NUMBER, +operand_val)
@@ -194,9 +207,9 @@ class Interpreter:
                     )
         elif isinstance(node, Stmts):
             for stmt in node.stmts:
-                self.interpret(stmt)
+                self.interpret(stmt, env)
         elif isinstance(node, PrintStmt):
-            _, expr_value = self.interpret(node.value)
+            _, expr_value = self.interpret(node.value, env)
             print(
                 codecs.escape_decode(bytes(str(expr_value), "utf-8"))[0].decode(
                     "utf-8"
@@ -204,10 +217,16 @@ class Interpreter:
                 end=node.end,
             )
         elif isinstance(node, IfStmt):
-            test_type, test_val = self.interpret(node.test)
+            test_type, test_val = self.interpret(node.test, env)
             if test_type != TYPE_BOOL:
                 runtime_error("Condition test is not a boolean expression", node.line)
             if test_val:
-                self.interpret(node.then_stmts)
+                self.interpret(node.then_stmts, env.new_env())
             else:
-                self.interpret(node.else_stmts)
+                self.interpret(node.else_stmts, env.new_env())
+
+
+def interpret_ast(self, node):
+    # entry point for interpreter, creating a brand new global/parent environment
+    env = Environment()
+    self.interpret(node, env)

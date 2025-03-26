@@ -225,8 +225,7 @@ class Interpreter:
             else:
                 self.interpret(node.else_stmts, env.new_env())
 
-
-def interpret_ast(self, node):
-    # entry point for interpreter, creating a brand new global/parent environment
-    env = Environment()
-    self.interpret(node, env)
+    def interpret_ast(self, node):
+        # entry point for interpreter, creating a brand new global/parent environment
+        env = Environment()
+        self.interpret(node, env)

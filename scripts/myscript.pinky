@@ -5,11 +5,11 @@ println 1 + 2
 x := 0
 x := x + 1
 
-x := x + y
-
--- Simple if 
-if 5 > 2 then
-    println("Entered then")
+if 5 ~=2 then
+    y := x + 20
+    println("I have access to the local y = " + y)
+    println("I have also access to the global x = " + x)
 else
-    println("Entered else")
+    x := y
+    println("Error, no local variable " + y)
 end

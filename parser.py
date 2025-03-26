@@ -187,6 +187,14 @@ class Parser:
             val = self.expr()
             return PrintStmt(val, end, line=self.previous_token().line)
 
+    def while_stmt(self):
+        self.expect(TokenType.WHILE)
+        test = self.expr()
+        self.expect(TokenType.DO)
+        while_stmts = self.stmts()
+        self.expect(TokenType.END)
+        return WhileStmt(test, while_stmts, line=self.previous_token().line)
+
     # <if_stmt> ::= "if" <expr> "then" <stmts> ( "else" <stmts> )? "end"
     def if_stmt(self):
         self.expect(TokenType.IF)
@@ -210,6 +218,8 @@ class Parser:
             return self.print_stmt(end="\n")
         elif self.peek().token_type == TokenType.IF:
             return self.if_stmt()
+        elif self.peek().token_type == TokenType.WHILE:
+            return self.while_stmt()
         # elif self.peek().token_type == TokenType.WHILE:
         #  return self.while_stmt()
         # elif self.peek().token_type == TokenType.FOR:

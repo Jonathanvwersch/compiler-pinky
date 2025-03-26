@@ -216,6 +216,15 @@ class Interpreter:
                 ),
                 end=node.end,
             )
+        elif isinstance(node, WhileStmt):
+            test_type, test_val = self.interpret(node.test, env)
+            if test_type != TYPE_BOOL:
+                runtime_error("Condition test is not a boolean expression", node.line)
+            if test_val:
+                self.interpret(node.while_stmts, env.new_env())
+            else:
+                self.interpret(node.while_stmts, env.new_env())
+
         elif isinstance(node, IfStmt):
             test_type, test_val = self.interpret(node.test, env)
             if test_type != TYPE_BOOL:

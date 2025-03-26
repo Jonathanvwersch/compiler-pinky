@@ -13,3 +13,10 @@ else
     x := y
     println("Error, no local variable " + y)
 end
+
+
+i := 1
+while i <= 10 do
+    println("i = " + i)
+    i := i + 1
+end

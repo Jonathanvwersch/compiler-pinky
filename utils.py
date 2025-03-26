@@ -11,6 +11,7 @@ from model import (
     Stmts,
     String,
     UnOp,
+    WhileStmt,
 )
 
 
@@ -96,6 +97,35 @@ def pretty_print_ast(node, prefix="", is_root=True, is_last=True):
             pretty_print_ast(node.else_stmts, child_prefix + "    ", False, True)
 
         return
+    elif isinstance(node, WhileStmt):
+        if is_root:
+            print(f"{prefix}WhileStmt")
+        elif is_last:
+            print(f"{prefix}└── WhileStmt")
+        else:
+            print(f"{prefix}├── WhileStmt")
+
+        if is_root:
+            child_prefix = prefix
+        elif is_last:
+            child_prefix = prefix + "    "
+        else:
+            child_prefix = prefix + "│   "
+
+        print(f"{child_prefix}├── Condition:")
+        pretty_print_ast(node.test, child_prefix + "│   ", False, True)
+
+        print(f"{child_prefix}└── Do:")
+
+        if isinstance(node.while_stmts, Stmts):
+            for i, stmt in enumerate(node.while_stmts.stmts):
+                is_last_stmt = i == len(node.while_stmts.stmts) - 1
+                pretty_print_ast(stmt, child_prefix + "    ", False, is_last_stmt)
+        else:
+            pretty_print_ast(node.while_stmts, child_prefix + "    ", False, True)
+
+        return
+
     elif isinstance(node, Float):
         node_str = f"Float({node.value})"
         left = right = None

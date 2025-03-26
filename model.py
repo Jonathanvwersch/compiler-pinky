@@ -195,6 +195,22 @@ class IfStmt(Stmt):
         return f"IfStmt({self.test}, then:{self.then_stmts}, else:{self.else_stmts})"
 
 
+class WhileStmt(Stmt):
+    """
+    "while" <expr> "do" <while_stmt> "end"
+    """
+
+    def __init__(self, test, while_stmts, line):
+        assert isinstance(test, Expr), test
+        assert isinstance(while_stmts, Stmts), while_stmts
+        self.test = test
+        self.while_stmts = while_stmts
+        self.line = line
+
+    def __repr__(self):
+        return f"whileStmt({self.test}, do:{self.while_stmts})"
+
+
 class Identifier(Expr):
     """
     Example: x, PI, y

@@ -178,7 +178,6 @@ class Interpreter:
                     return (left_type, left_val)
 
             return self.interpret(node.right)
-
         elif isinstance(node, UnOp):
             operand_type, operand_val = self.interpret(node.operand, env)
             if node.op.token_type == TokenType.PLUS:
@@ -217,13 +216,16 @@ class Interpreter:
                 end=node.end,
             )
         elif isinstance(node, WhileStmt):
-            test_type, test_val = self.interpret(node.test, env)
-            if test_type != TYPE_BOOL:
-                runtime_error("Condition test is not a boolean expression", node.line)
-            if test_val:
-                self.interpret(node.while_stmts, env.new_env())
-            else:
-                self.interpret(node.while_stmts, env.new_env())
+            new_env = env.new_env()
+            while True:
+                test_type, test_val = self.interpret(node.test, env)
+                if test_type != TYPE_BOOL:
+                    runtime_error(f"While test is not a boolean expression", node.line)
+
+                if not test_val:
+                    break
+
+                self.interpret(node.while_stmts, new_env)
 
         elif isinstance(node, IfStmt):
             test_type, test_val = self.interpret(node.test, env)

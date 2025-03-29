@@ -232,6 +232,14 @@ def runtime_error(message, line_num):
     print(f"{Colors.RED}[Line {line_num}]: {message}{Colors.WHITE}")
 
 
+def stringify(val):
+    if isinstance(val, bool):
+        return "true" if val == True else False
+    if isinstance(val, float) and val.is_integer():
+        return str(int(val))
+    return str(val)
+
+
 class Colors:
     WHITE = "\033[0m"
     BLUE = "\033[94m"

@@ -1,7 +1,7 @@
 import codecs
 from model import *
 from state import Environment
-from utils import runtime_error
+from utils import runtime_error, stringify
 
 
 TYPE_NUMBER = "TYPE_NUMBER"
@@ -41,7 +41,7 @@ class Interpreter:
                 if left_type == TYPE_NUMBER and right_type == TYPE_NUMBER:
                     return (TYPE_NUMBER, left_val + right_val)
                 elif left_type == TYPE_STRING or right_type == TYPE_STRING:
-                    return (TYPE_STRING, str(left_val) + str(right_val))
+                    return (TYPE_STRING, stringify(left_val) + stringify(right_val))
                 else:
                     runtime_error(
                         f"Unsupported operator {node.op.lexeme} between {left_type} and {right_type}",
@@ -209,10 +209,9 @@ class Interpreter:
                 self.interpret(stmt, env)
         elif isinstance(node, PrintStmt):
             _, expr_value = self.interpret(node.value, env)
+            val = stringify(expr_value)
             print(
-                codecs.escape_decode(bytes(str(expr_value), "utf-8"))[0].decode(
-                    "utf-8"
-                ),
+                codecs.escape_decode(bytes(val, "utf-8"))[0].decode("utf-8"),
                 end=node.end,
             )
         elif isinstance(node, WhileStmt):

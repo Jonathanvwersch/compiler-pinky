@@ -23,4 +23,13 @@ for num := 1, 10, 2 do
 end
 
 
-println(true)
+func max(a,b)
+    if a > b then
+        print(a)
+    end
+    print(b)
+end
+
+x := max(7, 2)
+
+-- println(x)

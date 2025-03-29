@@ -23,6 +23,15 @@ class Stmt(Node):
     pass
 
 
+class Decl(Stmt):
+    """
+    Declarations are statements to declare a new name
+    (in our case, functions)
+    """
+
+    pass
+
+
 class Integer(Expr):
     """
     Example: 17
@@ -263,3 +272,50 @@ class Assignment(Stmt):
 
     def __repr__(self):
         return f"Assignment(left: {self.left}, right: {self.right})"
+
+
+class FuncDecl(Stmt):
+    """
+    "func" <name> "(" <params>? ")" <body_stmts> "end"
+    """
+
+    def __init__(self, name, params, body_stmts, line):
+        assert isinstance(name, str), name
+        assert isinstance(body_stmts, Stmts), body_stmts
+        assert all(isinstance(param, Param) for param in params), params
+        self.name = name
+        self.params = params
+        self.line = line
+        self.body_stmts = body_stmts
+
+    def __repr__(self):
+        return f"FuncDecl(name: {self.name}, params: {self.params}, stmts: {self.body_stmts})"
+
+
+class Param(Decl):
+    """
+    A single function parameter
+    """
+
+    def __init__(self, name, line):
+        assert isinstance(name, str), name
+        self.name = name
+        self.line = line
+
+    def __repr__(self):
+        return f"Param({self.name!r})"
+
+
+class FuncCall(Expr):
+    """
+    <name> "(" <args>? ")"
+    <args> ::= <expr> ( ',' <expr> )*
+    """
+
+    def __init__(self, name, args, line):
+        self.name = name
+        self.args = args
+        self.line = line
+
+    def __repr__(self):
+        return f"FuncCall({self.name!r}, {self.args})"

@@ -228,6 +228,27 @@ class Parser:
         self.expect(TokenType.END)
         return IfStmt(test, then_stmts, else_stmts, line=self.previous_token().line)
 
+    def params(self):
+        params = []
+        while not self.is_next(TokenType.RPAREN):
+            name = self.expect(TokenType.IDENTIFIER)
+            params.append(Param(name.lexeme, line=self.previous_token().line))
+            if not self.is_next(TokenType.RPAREN):
+                self.expect(TokenType.COMMA)
+        return params
+
+    def func_decl(self):
+        self.expect(TokenType.FUNC)
+        name = self.expect(TokenType.IDENTIFIER)
+        self.expect(TokenType.LPAREN)
+        params = self.params()
+        self.expect(TokenType.RPAREN)
+        body_stmts = self.stmts()
+        self.expect(TokenType.END)
+        return FuncDecl(
+            name.lexeme, params, body_stmts, line=self.previous_token().line
+        )
+
     def stmt(self):
         if self.peek().token_type == TokenType.PRINT:
             return self.print_stmt(end="")
@@ -239,8 +260,8 @@ class Parser:
             return self.while_stmt()
         elif self.peek().token_type == TokenType.FOR:
             return self.for_stmt()
-        # elif self.peek().token_type == TokenType.FUNC:
-        #  return self.func_decl()
+        elif self.peek().token_type == TokenType.FUNC:
+            return self.func_decl()
         else:
             left = self.expr()
             if self.match(TokenType.ASSIGN):

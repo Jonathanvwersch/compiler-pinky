@@ -227,6 +227,33 @@ class Interpreter:
 
                 self.interpret(node.while_stmts, new_env)
 
+        elif isinstance(node, ForStmt):
+            new_env = env.new_env()
+            var_name = node.identifier.name
+            i_type, i = self.interpret(node.start, env)
+            end_type, end = self.interpret(node.end, env)
+
+            if i < end:
+                if node.step is None:
+                    step = 1
+                else:
+                    step_type, step = self.interpret(node.step, env)
+
+                while i <= end:
+                    env.set_var(var_name, (TYPE_NUMBER, i))
+                    self.interpret(node.for_stmts, new_env)
+                    i += step
+            else:
+                if node.step is None:
+                    step = -1
+                else:
+                    step_type, step = self.interpret(node.step, env)
+
+                while i >= end:
+                    env.set_var(var_name, (TYPE_NUMBER, i))
+                    self.interpret(node.for_stmts, new_env)
+                    i = i + step
+
         elif isinstance(node, IfStmt):
             test_type, test_val = self.interpret(node.test, env)
             if test_type != TYPE_BOOL:

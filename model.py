@@ -211,6 +211,28 @@ class WhileStmt(Stmt):
         return f"whileStmt({self.test}, do:{self.while_stmts})"
 
 
+class ForStmt(Stmt):
+    """
+    "for" <identifier> ":=" <start> "," <end> ("," <increment>)? "do" <for_stmts> "end"
+    """
+
+    def __init__(self, identifier, start, end, step, for_stmts, line):
+        assert isinstance(identifier, Identifier), identifier
+        assert isinstance(start, Expr), start
+        assert isinstance(end, Expr), end
+        assert isinstance(step, Expr), step
+        assert isinstance(for_stmts, Stmts), for_stmts
+        self.step = step
+        self.for_stmts = for_stmts
+        self.start = start
+        self.end = end
+        self.line = line
+        self.identifier = identifier
+
+    def __repr__(self):
+        return f"ForStmt({self.identifier}, {self.start}, {self.end}, {self.step}, {self.for_stmts})"
+
+
 class Identifier(Expr):
     """
     Example: x, PI, y

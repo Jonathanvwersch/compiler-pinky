@@ -2,6 +2,7 @@ from model import (
     Assignment,
     BinOp,
     Float,
+    ForStmt,
     Grouping,
     Identifier,
     IfStmt,
@@ -97,6 +98,40 @@ def pretty_print_ast(node, prefix="", is_root=True, is_last=True):
             pretty_print_ast(node.else_stmts, child_prefix + "    ", False, True)
 
         return
+
+    elif isinstance(node, ForStmt):
+        if is_root:
+            print(f"{prefix}ForStmt")
+        elif is_last:
+            print(f"{prefix}└── ForStmt")
+        else:
+            print(f"{prefix}├── ForStmt")
+
+        if is_root:
+            child_prefix = prefix
+        elif is_last:
+            child_prefix = prefix + "    "
+        else:
+            child_prefix = prefix + "│   "
+
+        print(f"{child_prefix}├── Initialization:")
+        pretty_print_ast(node.identifier, child_prefix + "│   ", False, True)
+        pretty_print_ast(node.start, child_prefix + "│   ", False, True)
+        pretty_print_ast(node.end, child_prefix + "│   ", False, True)
+
+        print(f"{child_prefix}├── Increment:")
+        pretty_print_ast(node.step, child_prefix + "│   ", False, True)
+
+        print(f"{child_prefix}└── Do:")
+        if isinstance(node.for_stmts, Stmts):
+            for i, stmt in enumerate(node.for_stmts.stmts):
+                is_last_stmt = i == len(node.for_stmts.stmts) - 1
+                pretty_print_ast(stmt, child_prefix + "    ", False, is_last_stmt)
+        else:
+            pretty_print_ast(node.for_stmts, child_prefix + "    ", False, True)
+
+        return
+
     elif isinstance(node, WhileStmt):
         if is_root:
             print(f"{prefix}WhileStmt")

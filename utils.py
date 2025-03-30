@@ -4,6 +4,7 @@ from model import (
     Float,
     ForStmt,
     FuncCall,
+    FuncCallStmt,
     FuncDecl,
     Grouping,
     Identifier,
@@ -200,6 +201,13 @@ def pretty_print_ast(node, prefix="", is_root=True, is_last=True):
                 pretty_print_ast(stmt, child_prefix + "    ", False, is_last_stmt)
         else:
             pretty_print_ast(node.while_stmts, child_prefix + "    ", False, True)
+        return
+
+    elif isinstance(node, FuncCallStmt):
+        print_label("FuncCallStmt")
+        child_prefix = get_child_prefix(prefix, is_root, is_last)
+        print(f"{child_prefix}└──")
+        pretty_print_ast(node.expr, child_prefix + "    ")
         return
 
     elif isinstance(node, FuncDecl):

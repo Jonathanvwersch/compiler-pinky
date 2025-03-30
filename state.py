@@ -1,6 +1,7 @@
 class Environment:
     def __init__(self, parent=None):
         self.vars = {}
+        self.funcs = {}  # a dict to store the functions in the env
         self.parent = parent
 
     def get_var(self, name):
@@ -34,3 +35,15 @@ class Environment:
         This is used to create a new nested scope (while, funcs, etc.)
         """
         return Environment(parent=self)
+
+    def get_func(self, name):
+        while self:
+            value = self.funcs.get(name)
+            if value is not None:
+                return value
+            else:
+                self = self.parent
+        return None
+
+    def set_func(self, name, value):
+        self.funcs[name] = value

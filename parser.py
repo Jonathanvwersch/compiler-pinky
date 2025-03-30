@@ -57,6 +57,14 @@ class Parser:
         )  # If it is a match, we return True and also comsume that token
         return True
 
+    def args(self):
+        args = []
+        while not self.is_next(TokenType.RPAREN):
+            args.append(self.expr())
+            if not self.is_next(TokenType.RPAREN):
+                self.expect(TokenType.COMMA)
+        return args
+
     # <primary>  ::=  <integer>
     #              |  <float>
     #              |  <bool>
@@ -87,7 +95,14 @@ class Parser:
                 return Grouping(expr, line=self.previous_token().line)
         else:
             identifier = self.expect(TokenType.IDENTIFIER)
-            return Identifier(identifier.lexeme, line=self.previous_token().line)
+            if self.match(TokenType.LPAREN):
+                args = self.args()
+                self.expect(TokenType.RPAREN)
+                return FuncCall(
+                    identifier.lexeme, args, line=self.previous_token().line
+                )
+            else:
+                return Identifier(identifier.lexeme, line=self.previous_token().line)
 
     # <exponent> ::= <primary> ( "^" <exponent> )*
     def exponent(self):
@@ -267,7 +282,8 @@ class Parser:
             if self.match(TokenType.ASSIGN):
                 right = self.expr()
                 return Assignment(left, right, line=self.previous_token().line)
-            pass
+            else:
+                return FuncCallStmt(left)
 
     def stmts(self):
         stmts = []

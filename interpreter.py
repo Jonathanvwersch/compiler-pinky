@@ -252,7 +252,35 @@ class Interpreter:
                     env.set_var(var_name, (TYPE_NUMBER, i))
                     self.interpret(node.for_stmts, new_env)
                     i = i + step
+        elif isinstance(node, FuncDecl):
+            env.set_func(node.name, (node, env))
+        elif isinstance(node, FuncCall):
+            func = env.get_func(node.name)
+            if not func:
+                runtime_error(f"Function {node.name!r} not declared", node.line)
 
+            func_decl = func[0]
+            func_env = func[1]
+
+            if len(node.args) != len(func_decl.params):
+                runtime_error(
+                    f"Function {func_decl.name} expected {len(func_decl.params)} params but {len(node.args)} arguments were passed"
+                )
+
+            args = []
+
+            for arg in node.args:
+                args.append(self.interpret(arg, env))
+
+            new_func_env = func_env.new_env()
+
+            for param, arg_val in zip(func_decl.params, args):
+                new_func_env.set_var(param, arg_val)
+
+            self.interpret(func_decl.body_stmts, new_func_env)
+
+        elif isinstance(node, FuncCallStmt):
+            self.interpret(node.expr, env)
         elif isinstance(node, IfStmt):
             test_type, test_val = self.interpret(node.test, env)
             if test_type != TYPE_BOOL:

@@ -1,10 +1,12 @@
-from tokens import Token, TokenType
+from tokens import *
 
 
 class Node:
     """
     The parent class for every node in the AST
     """
+
+    pass
 
 
 class Expr(Node):
@@ -25,8 +27,7 @@ class Stmt(Node):
 
 class Decl(Stmt):
     """
-    Declarations are statements to declare a new name
-    (in our case, functions)
+    Declarations are statements to declare a new name (in our case, functions)
     """
 
     pass
@@ -48,7 +49,7 @@ class Integer(Expr):
 
 class Float(Expr):
     """
-    Example 1.234
+    Example: 3.141592
     """
 
     def __init__(self, value, line):
@@ -60,40 +61,66 @@ class Float(Expr):
         return f"Float[{self.value}]"
 
 
+class Bool(Expr):
+    """
+    Example: true, false
+    """
+
+    def __init__(self, value, line):
+        assert isinstance(value, bool), value
+        self.value = value
+        self.line = line
+
+    def __repr__(self):
+        return f"Bool[{self.value}]"
+
+
+class String(Expr):
+    """
+    Example: 'this is a string'
+    """
+
+    def __init__(self, value, line):
+        assert isinstance(value, str), value
+        self.value = value
+        self.line = line
+
+    def __repr__(self):
+        return f"String[{self.value}]"
+
+
 class UnOp(Expr):
     """
-    Example -operand
+    Example: -operand
     """
 
     def __init__(self, op: Token, operand: Expr, line):
         assert isinstance(op, Token), op
         assert isinstance(operand, Expr), operand
-        self.line = line
-
         self.op = op
         self.operand = operand
+        self.line = line
 
     def __repr__(self):
-        return f"UnOp({self.op.lexeme}, {self.operand})"
+        return f"UnOp({self.op.lexeme!r}, {self.operand})"
 
 
 class BinOp(Expr):
     """
-    Example x + y
+    Example: x + y
     """
 
     def __init__(self, op: Token, left: Expr, right: Expr, line):
         assert isinstance(op, Token), op
         assert isinstance(left, Expr), left
         assert isinstance(right, Expr), right
-
         self.op = op
         self.left = left
         self.right = right
         self.line = line
 
     def __repr__(self):
-        return f"BinOp({self.op.lexeme}, {self.left}, {self.right})"
+        return f"BinOp({self.op.lexeme!r}, {self.left}, {self.right})"
 
 
 class LogicalOp(Expr):
@@ -105,14 +132,13 @@ class LogicalOp(Expr):
         assert isinstance(op, Token), op
         assert isinstance(left, Expr), left
         assert isinstance(right, Expr), right
-
         self.op = op
         self.left = left
         self.right = right
         self.line = line
 
     def __repr__(self):
-        return f"LogicalOp({self.op.lexeme}, {self.left}, {self.right})"
+        return f"LogicalOp({self.op.lexeme!r}, {self.left}, {self.right})"
 
 
 class Grouping(Expr):
@@ -129,32 +155,18 @@ class Grouping(Expr):
         return f"Grouping({self.value})"
 
 
-class Bool(Expr):
+class Identifier(Expr):
     """
-    Example: true, false
+    Example: x, PI, _score, numLives, start_vel
     """
 
-    def __init__(self, value, line):
-        assert isinstance(value, bool), value
-        self.value = value
+    def __init__(self, name, line):
+        assert isinstance(name, str), name
+        self.name = name
         self.line = line
 
     def __repr__(self):
-        return f"Grouping({self.value})"
-
-
-class String(Expr):
-    """
-    Example: 'this is a string'
-    """
-
-    def __init__(self, value, line):
-        assert isinstance(value, str), value
-        self.value = value
-        self.line = line
-
-    def __repr__(self):
-        return f"String({self.value})"
+        return f"Identifier[{self.name}]"
 
 
 class Stmts(Node):
@@ -173,17 +185,17 @@ class Stmts(Node):
 
 class PrintStmt(Stmt):
     """
-    Example: print value
+    Example: print value, println value
     """
 
     def __init__(self, value, end, line):
         assert isinstance(value, Expr), value
         self.value = value
-        self.line = line
         self.end = end
+        self.line = line
 
     def __repr__(self):
-        return f"PrintStmt({self.value}), end={self.end!r}"
+        return f"PrintStmt({self.value}, end={self.end!r})"
 
 
 class IfStmt(Stmt):
@@ -206,61 +218,23 @@ class IfStmt(Stmt):
 
 class WhileStmt(Stmt):
     """
-    "while" <expr> "do" <while_stmt> "end"
+    "while" <expr> "do" <body_stmts> "end"
     """
 
-    def __init__(self, test, while_stmts, line):
+    def __init__(self, test, body_stmts, line):
         assert isinstance(test, Expr), test
-        assert isinstance(while_stmts, Stmts), while_stmts
+        assert isinstance(body_stmts, Stmts), body_stmts
         self.test = test
-        self.while_stmts = while_stmts
+        self.body_stmts = body_stmts
         self.line = line
 
     def __repr__(self):
-        return f"whileStmt({self.test}, do:{self.while_stmts})"
-
-
-class ForStmt(Stmt):
-    """
-    "for" <identifier> ":=" <start> "," <end> ("," <increment>)? "do" <for_stmts> "end"
-    """
-
-    def __init__(self, identifier, start, end, step, for_stmts, line):
-        assert isinstance(identifier, Identifier), identifier
-        assert isinstance(start, Expr), start
-        assert isinstance(end, Expr), end
-        assert isinstance(step, Expr), step
-        assert isinstance(for_stmts, Stmts), for_stmts
-        self.step = step
-        self.for_stmts = for_stmts
-        self.start = start
-        self.end = end
-        self.line = line
-        self.identifier = identifier
-
-    def __repr__(self):
-        return f"ForStmt({self.identifier}, {self.start}, {self.end}, {self.step}, {self.for_stmts})"
-
-
-class Identifier(Expr):
-    """
-    Example: x, PI, y
-    """
-
-    def __init__(self, name, line):
-        assert isinstance(name, str), name
-        self.name = name
-        self.line = line
-
-    def __repr__(self):
-        return f"Identifier({self.name})"
+        return f"WhileStmt({self.test}, {self.body_stmts})"
 
 
 class Assignment(Stmt):
     """
     left := right
-    x := 12 + 34 + (3 - y)
-    12 := x
     """
 
     def __init__(self, left, right, line):
@@ -271,25 +245,46 @@ class Assignment(Stmt):
         self.line = line
 
     def __repr__(self):
-        return f"Assignment(left: {self.left}, right: {self.right})"
+        return f"Assignment({self.left}, {self.right})"
 
 
-class FuncDecl(Stmt):
+class ForStmt(Stmt):
+    """
+    "for" <identifier> ":=" <start> "," <end> ("," <step>)? "do" <body_stmts> "end"
+    """
+
+    def __init__(self, ident, start, end, step, body_stmts, line):
+        assert isinstance(ident, Identifier), ident
+        assert isinstance(start, Expr), start
+        assert isinstance(end, Expr), end
+        assert isinstance(step, Expr) or step is None, step
+        assert isinstance(body_stmts, Stmts), body_stmts
+        self.ident = ident
+        self.start = start
+        self.end = end
+        self.step = step
+        self.body_stmts = body_stmts
+        self.line = line
+
+    def __repr__(self):
+        return f"ForStmt({self.ident}, {self.start}, {self.end}, {self.step}, {self.body_stmts})"
+
+
+class FuncDecl(Decl):
     """
     "func" <name> "(" <params>? ")" <body_stmts> "end"
     """
 
     def __init__(self, name, params, body_stmts, line):
         assert isinstance(name, str), name
-        assert isinstance(body_stmts, Stmts), body_stmts
         assert all(isinstance(param, Param) for param in params), params
         self.name = name
         self.params = params
-        self.line = line
         self.body_stmts = body_stmts
+        self.line = line
 
     def __repr__(self):
-        return f"FuncDecl(name: {self.name}, params: {self.params}, stmts: {self.body_stmts})"
+        return f"FuncDecl({self.name!r}, {self.params}, {self.body_stmts})"
 
 
 class Param(Decl):
@@ -303,12 +298,12 @@ class Param(Decl):
         self.line = line
 
     def __repr__(self):
-        return f"Param({self.name!r})"
+        return f"Param[{self.name!r}]"
 
 
 class FuncCall(Expr):
     """
-    <name> "(" <args>? ")"
+    <func_call>  ::=  <name> "(" <args>? ")"
     <args> ::= <expr> ( ',' <expr> )*
     """
 

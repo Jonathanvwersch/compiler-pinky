@@ -1,8 +1,9 @@
 func max(a,b)
     if a > b then
         print(a)
+    else
+        print(b)
     end
-    print(b)
 end
 max(7, 2)
 

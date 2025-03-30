@@ -47,3 +47,14 @@ class Environment:
 
     def set_func(self, name, value):
         self.funcs[name] = value
+
+    def __repr__(self):
+        print("Params")
+        print("└──")
+        for var in self.vars:
+            print(f"     {var}")
+
+        print("Funcs")
+        print("└──")
+        for var in self.vars:
+            print(f"     {var}")

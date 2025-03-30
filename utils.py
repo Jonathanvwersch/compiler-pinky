@@ -13,6 +13,7 @@ from model import (
     LogicalOp,
     Param,
     PrintStmt,
+    RetStmt,
     Stmts,
     String,
     UnOp,
@@ -128,6 +129,14 @@ def pretty_print_ast(node, prefix="", is_root=True, is_last=True):
     elif isinstance(node, PrintStmt):
         # We'll show 'PrintStmt' or 'PrintStmt end="\n"' based on the node
         print_label("PrintStmt")
+        child_prefix = get_child_prefix(prefix, is_root, is_last)
+
+        # The expression to print
+        pretty_print_ast(node.value, child_prefix, False, True)
+        return
+
+    elif isinstance(node, RetStmt):
+        print_label("RetStmt")
         child_prefix = get_child_prefix(prefix, is_root, is_last)
 
         # The expression to print

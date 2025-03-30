@@ -248,6 +248,10 @@ class Parser:
         while not self.is_next(TokenType.RPAREN):
             name = self.expect(TokenType.IDENTIFIER)
             params.append(Param(name.lexeme, line=self.previous_token().line))
+            if len(params) > 255:
+                parse_error(
+                    f"Functions cannot have more than 255 parameters", name.line
+                )
             if not self.is_next(TokenType.RPAREN):
                 self.expect(TokenType.COMMA)
         return params
@@ -264,6 +268,11 @@ class Parser:
             name.lexeme, params, body_stmts, line=self.previous_token().line
         )
 
+    def ret_stmt(self):
+        self.expect(TokenType.RET)
+        value = self.expr()
+        return RetStmt(value, line=self.previous_token().line)
+
     def stmt(self):
         if self.peek().token_type == TokenType.PRINT:
             return self.print_stmt(end="")
@@ -277,6 +286,8 @@ class Parser:
             return self.for_stmt()
         elif self.peek().token_type == TokenType.FUNC:
             return self.func_decl()
+        elif self.peek().token_type == TokenType.RET:
+            return self.ret_stmt()
         else:
             left = self.expr()
             if self.match(TokenType.ASSIGN):

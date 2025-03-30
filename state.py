@@ -29,6 +29,9 @@ class Environment:
             self = self.parent
         original_env.vars[name] = value
 
+    def set_param_as_local_var(self, name, value):
+        self.vars[name] = value
+
     def new_env(self):
         """
         Returns a new environment that is a child of the current one.

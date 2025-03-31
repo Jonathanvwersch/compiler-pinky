@@ -61,6 +61,7 @@ class TokenType(Enum):
     PRINT = "PRINT"
     PRINTLN = "PRINTLN"
     RET = "RET"
+    LOCAL = "LOCAL"
 
 
 keywords = {
@@ -80,6 +81,7 @@ keywords = {
     "print": TokenType.PRINT,
     "println": TokenType.PRINTLN,
     "ret": TokenType.RET,
+    "local": TokenType.LOCAL,
 }
 
 

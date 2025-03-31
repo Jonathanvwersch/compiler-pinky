@@ -10,6 +10,7 @@ from model import (
     Identifier,
     IfStmt,
     Integer,
+    LocalAssignment,
     LogicalOp,
     Param,
     PrintStmt,
@@ -133,6 +134,13 @@ def pretty_print_ast(node, prefix="", is_root=True, is_last=True):
 
         # The expression to print
         pretty_print_ast(node.value, child_prefix, False, True)
+        return
+
+    elif isinstance(node, LocalAssignment):
+        print_label(f"LocalAssignment")
+        child_prefix = get_child_prefix(prefix, is_root, is_last)
+        pretty_print_ast(node.left, child_prefix, False, False)
+        pretty_print_ast(node.right, child_prefix, False, True)
         return
 
     elif isinstance(node, RetStmt):

@@ -273,6 +273,13 @@ class Parser:
         value = self.expr()
         return RetStmt(value, line=self.previous_token().line)
 
+    def local_assign(self):
+        self.expect(TokenType.LOCAL)
+        left = self.expr()
+        self.expect(TokenType.ASSIGN)
+        right = self.expr()
+        return LocalAssignment(left, right, line=self.previous_token().line)
+
     def stmt(self):
         if self.peek().token_type == TokenType.PRINT:
             return self.print_stmt(end="")
@@ -288,6 +295,8 @@ class Parser:
             return self.func_decl()
         elif self.peek().token_type == TokenType.RET:
             return self.ret_stmt()
+        elif self.peek().token_type == TokenType.LOCAL:
+            return self.local_assign()
         else:
             left = self.expr()
             if self.match(TokenType.ASSIGN):

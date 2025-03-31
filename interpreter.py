@@ -317,7 +317,7 @@ class Interpreter:
 
             # We must create local variables in the new child environment of the function for the parameters and bind the argument values to them!
             for param, argval in zip(func_decl.params, args):
-                new_func_env.set_param_as_local_var(param.name, argval)
+                new_func_env.set_local_var(param.name, argval)
 
             # Finally, we ask to interpret the body_stmts of the function declaration
             try:
@@ -330,6 +330,10 @@ class Interpreter:
 
         elif isinstance(node, FuncCallStmt):
             self.interpret(node.expr, env)
+
+        elif isinstance(node, LocalAssignment):
+            right_type, right_val = self.interpret(node.right, env)
+            env.set_local_var(node.left.name, (right_type, right_val))
 
     def interpret_ast(self, node):
         # Entry point of our interpreter creating a brand new global/parent environment

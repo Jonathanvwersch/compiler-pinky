@@ -29,7 +29,10 @@ class Environment:
             self = self.parent
         original_env.vars[name] = value
 
-    def set_param_as_local_var(self, name, value):
+    def set_local_var(self, name, value):
+        """
+        Sets a new variable in the current/immediate environment (shadowing any previous values of that variable name)
+        """
         self.vars[name] = value
 
     def new_env(self):

@@ -1,12 +1,1 @@
-x := 0
-
-func max(a,b)
-    local x := 999
-    if a > b then
-        ret a
-    else
-        ret b
-    end
-end
-println max(7, 2)
-println(x)
+print 2 + 3 - 1

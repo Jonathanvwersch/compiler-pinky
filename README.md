@@ -22,10 +22,12 @@ Pinky is a straightforward programming language implementation that includes:
 
 ## Project Structure
 
-The interpreter is split into several key files:
+The compiler and interpreter are split into several key files:
 
 - `pinky.py` - The main entry point that runs the interpreter
 - `parser.py` - Parses tokens into an abstract syntax tree (AST)
 - `tokens.py` - Defines the language's tokens and token types
 - `model.py` - Contains the AST node classes and data types
 - `utils.py` - Helper functions and utilities
+  the compiler
+- `compiler.py` - Stack based VM compiler

@@ -65,6 +65,14 @@ class Compiler:
             for stmt in node.stmts:
                 self.compile(stmt)
 
+        elif isinstance(node, UnOp):
+            self.compile(node.operand)
+            if node.op.token_type == TokenType.MINUS:
+                self.emit(("NEG",))
+            if node.op.token_type == TokenType.NOT:
+                self.emit(("PUSH", (TYPE_NUMBER, 1)))
+                self.emit(("XOR",))
+
         elif isinstance(node, PrintStmt):
             self.compile(node.value)
             if node.end == "":
@@ -77,3 +85,16 @@ class Compiler:
         self.compile(node)
         self.emit(("HALT",))
         return self.code
+
+    def print_code(self):
+        for instruction in self.code:
+            if instruction[0] == "LABEL":
+                print(instruction[1] + ":")
+                continue
+            if instruction[0] == "PUSH":
+                print(f"    {instruction[0]} {stringify(instruction[1][1])}")
+                continue
+            if len(instruction) == 1:
+                print(f"    {instruction[0]}")
+            elif len(instruction) == 2:
+                print(f"    {instruction[0]} {instruction[1]}")

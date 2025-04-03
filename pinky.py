@@ -7,7 +7,7 @@ from utils import Colors, pretty_print_ast
 from compiler import *
 from vm import *
 
-VERBOSE = False
+VERBOSE = True
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
@@ -45,14 +45,21 @@ if __name__ == "__main__":
         if VERBOSE:
             print("")
             print(f"{Colors.GREEN}**************************************")
-            print(f"{Colors.GREEN}CODE GNERATION:{Colors.WHITE}")
+            print(f"{Colors.GREEN}INTERPRETER:{Colors.WHITE}")
             print(f"{Colors.GREEN}**************************************{Colors.WHITE}")
 
-    # interpreter = Interpreter()
-    # interpreter.interpret_ast(ast)
-    compiler = Compiler()
-    code = compiler.compile_code(ast)
-    for instruction in code:
-        print(instruction)
+        interpreter = Interpreter()
+        interpreter.interpret_ast(ast)
+
+        if VERBOSE:
+            print("")
+            print(f"{Colors.GREEN}**************************************")
+            print(f"{Colors.GREEN}CODE GENERATION:{Colors.WHITE}")
+            print(f"{Colors.GREEN}**************************************{Colors.WHITE}")
+
+        compiler = Compiler()
+        code = compiler.compile_code(ast)
+        compiler.print_code()
+
     # vm = VM()
     # vm.run()

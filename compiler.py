@@ -78,7 +78,10 @@ class Compiler:
             if node.end == "":
                 self.emit(("PRINT",))
             else:
-                self.emit(("PRINTLN"))
+                self.emit(("PRINTLN",))
+
+        elif isinstance(node, Grouping):
+            self.compile(node.value)
 
     def compile_code(self, node):
         self.emit(("LABEL", "START"))

@@ -279,6 +279,10 @@ def runtime_error(message, line_num):
     print(f"{Colors.RED}[Line {line_num}]: {message}{Colors.WHITE}")
 
 
+def vm_error(message, pc):
+    print(f"{Colors.RED}[PC {pc}]: {message}{Colors.WHITE}")
+
+
 def stringify(val):
     if isinstance(val, bool):
         return "true" if val == True else False

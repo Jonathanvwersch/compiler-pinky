@@ -61,5 +61,5 @@ if __name__ == "__main__":
         code = compiler.compile_code(ast)
         compiler.print_code()
 
-    # vm = VM()
-    # vm.run()
+        vm = VM()
+        vm.run(code)

@@ -1,1 +1,9 @@
-println (2 + 3) * 5 -1
+
+
+if 3 >= 0 then
+    println "Entered the consequence block."
+else
+    println "Entered the alternative block"
+end
+
+
